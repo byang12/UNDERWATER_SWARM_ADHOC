@@ -4,13 +4,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import simpy
 import random
-
+import multiprocessing
 
 ##############################################################################
 # GSO PARAMETERS 
 ##############################################################################
 dims = 1000
-num_worms = 25
 nturns = 2000
 max_jitter = 0.2
 
@@ -19,10 +18,12 @@ max_jitter = 0.2
 ##############################################################################
 # Fitness Function 
 ##############################################################################
-def fitness_function(xx,yy):
-    x = xx/200
-    y = yy/200
-    return np.cos(x) * np.cos(y) * np.exp(-((x - np.pi)**2 + (y - np.pi)**2))
+def fitness_function(x, y): # Three-Hump Camel
+    x1 = x/180 - 2.9
+    x2 = y/180 - 2.9
+    # The formula for the Three-Hump Camel function
+    f_x = np.log(2 * x1**2 - 1.05 * x1**4 + (x1**6) / 6 + x1 * x2 + x2**2)
+    return (5-f_x)/10
 
 
 
@@ -51,7 +52,7 @@ def keep_in_bounds(x, dims):
     
 
 
-    """
+"""
 Compute the polar coordinates of (x1, y1) relative to (x2, y2).
 
 Parameters
@@ -105,7 +106,6 @@ def to_cartesian(polar, x2):
     return x1
 
 
-
 def weighted_random_choice(population, weights):
     """
     Selects a random element from a list with associated probabilities.
@@ -129,13 +129,12 @@ def weighted_random_choice(population, weights):
     return random.choices(population, weights=weights)[0]
 
 
-
 ##############################################################################
 # GSO FUNCTIONS 
 ##############################################################################
 class Glowworm:
     def __init__(self, env, name, swarm, X=np.array([1, 1]), waypoint = np.array([1, 1]),  speed=1.5433, 
-                 transRange=200, score = 0.0):
+                 transRange=190, score = 0.0):
         self.env = env
         self.name = name
         self.swarm = swarm  # List of all particles
@@ -171,7 +170,7 @@ class Glowworm:
         return msgInfluenceTable
 
 
-    def send(self):
+    def broadcast(self):
         """If worm j is within worm j's radius, record distance; else 0. For influence martrix"""
         for glowworm in self.swarm:
             distance =  np.linalg.norm(self.X-glowworm.X)
@@ -194,7 +193,6 @@ class Glowworm:
             if (tableEntry_name not in self.influenceTable) or (self.influenceTable[tableEntry_name]['score'] < tableEntry_score):
                 self.influenceTable[tableEntry_name] = {'distance':tableEntrytoSelf[0], 'angle':tableEntrytoSelf[1], 'score':tableEntry_score}
             
-
     def nextWaypoint(self): 
         """Calculate the worm's next waypoint based on the Table of influences."""
         """Choose the best worm"""
@@ -237,7 +235,6 @@ class Glowworm:
             self.X = newPosition
 
 
-
     ##############################################################################
     # SIMPY INTEGRATION
     ##############################################################################
@@ -252,7 +249,7 @@ class Glowworm:
             # Compute glowworm logic
             self.sensing()
             if i%5 == 0:
-                self.send()
+                self.broadcast()
             self.move()
 
             # Store positions for later analysis or plotting
@@ -263,7 +260,6 @@ class Glowworm:
 
             # Advance simulated time by 1 time unit
             yield self.env.timeout(1)
-
 
 
 def starting_points(num_worms):
@@ -287,9 +283,18 @@ def starting_points(num_worms):
     
     return np.array(list_glowworm)
 
+def check_termination_condition(sim_env, particles, target_position, threshold=1.0, radius=5):
+    while True:
+        count_within_radius = sum(
+            np.linalg.norm(p.X - target_position) <= radius for p in particles
+        )
+        if (count_within_radius >= threshold * len(particles)) or (sim_env.now >= nturns):
+            #print(f"Condition met at time {env.now}: {count_within_radius}/{len(particles)} particles near target.")
+            return [sim_env.event().succeed(),count_within_radius/len(particles)]  # Trigger the event to stop simulation
+        yield sim_env.timeout(1)
 
 
-def run_gso_simpy():
+def run_gso_simpy(AUVnum=25,transmissionRange=190):
     """
     Sets up the SimPy environment, runs the glowworm process,
     and returns the recorded positions.
@@ -297,30 +302,64 @@ def run_gso_simpy():
     sim_env = simpy.Environment()
 
     # Initial population
+    num_worms = AUVnum
+    T_R = transmissionRange
     pop = starting_points(num_worms)
 
     # Create and start the GSO process
     swarm = []    
     for i in range(num_worms):
-        swarm.append(Glowworm(env = sim_env, name = i, swarm = [], X=pop[i], waypoint = pop[i]+np.random.uniform(-50, 50, size=2)))
+        swarm.append(Glowworm(env = sim_env, name = i, transRange = transmissionRange, swarm = [], 
+                              X=pop[i], waypoint = pop[i]+np.random.uniform(-50, 50, size=2)))
 
     for glowworm in swarm:
         glowworm.swarm = swarm  # Give each glowworm the list of all glowworm
         #particle.target = [target_position,target_fitness]
 
     # Run the simulation
-    sim_env.run(until=nturns)
+    termination_event = sim_env.process(check_termination_condition(sim_env, swarm, np.array([x_max, y_max])))
+    sim_env.run(until=termination_event)  # Simulation stops when termination_event is triggered
 
     swarm_positions = []
     for glowworm in swarm:
         swarm_positions.append(glowworm.positions)
 
-    return swarm_positions
+    count_within_radius = sum(np.linalg.norm(glowworm.X - np.array([x_max, y_max])) <= 10 for glowworm in swarm)
 
+    return swarm_positions,count_within_radius/num_worms, sim_env.now
+
+
+def worker_function(AUVnum=25,transmissionRange=200):
+    # Perform CPU-bound computation on 'data'
+    AggregatePercentageList = []
+    AggregateDurationList = []
+    roundOfSimulation = 10
+    for i in range(roundOfSimulation):
+        all_positions,AUVpercentage,sim_duration = run_gso_simpy(AUVnum,transmissionRange)
+        AggregatePercentageList.append(AUVpercentage)
+        AggregateDurationList.append(sim_duration)
+        print(AUVpercentage, sim_duration)
+    avgAggregatePercentage = np.mean(AggregatePercentageList)
+    avgAggregateDuration = np.mean(AggregateDurationList)
+    print('AUV_NUM: ',AUVnum, ' AVG %: ', avgAggregatePercentage, ' AVG Duration: ',avgAggregateDuration)
+    return avgAggregatePercentage,avgAggregateDuration
 
 
 ##############################################################################
 # MAIN (Demo)
 ##############################################################################
 if __name__ == "__main__":
-    all_positions = run_gso_simpy()
+    processes = []
+    results = []
+    transmissionRange=200
+    numProcesses = 12
+
+    for item in range(numProcesses):
+        AUVnum = 10 + 10*item
+        p = multiprocessing.Process(target=worker_function, args=(AUVnum,transmissionRange,))
+        processes.append(p)
+        p.start()
+
+    for p in processes:
+        p.join() # Wait for processes to complete
+        # In a real scenario, you'd use queues or pipes to get results back
