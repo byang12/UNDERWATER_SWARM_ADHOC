@@ -1,0 +1,40 @@
+
+TR:  50 AUV_NUM:  25  AVG %:  0.012  AVG Duration:  2000.0
+
+TR:  150 AUV_NUM:  25  AVG %:  0.0  AVG Duration:  2000.0
+
+TR:  100 AUV_NUM:  25  AVG %:  0.0  AVG Duration:  2000.0
+
+TR:  400 AUV_NUM:  25  AVG %:  1.0  AVG Duration:  414.9
+
+TR:  350 AUV_NUM:  25  AVG %:  1.0  AVG Duration:  427.1
+
+TR:  700 AUV_NUM:  25  AVG %:  1.0  AVG Duration:  430.7
+
+TR:  850 AUV_NUM:  25  AVG %:  1.0  AVG Duration:  426.8
+
+TR:  800 AUV_NUM:  25  AVG %:  1.0  AVG Duration:  426.9
+
+TR:  900 AUV_NUM:  25  AVG %:  1.0  AVG Duration:  425.0
+
+TR:  500 AUV_NUM:  25  AVG %:  1.0  AVG Duration:  581.2
+
+TR:  600 AUV_NUM:  25  AVG %:  1.0  AVG Duration:  583.8
+
+TR:  550 AUV_NUM:  25  AVG %:  1.0  AVG Duration:  584.2
+
+TR:  750 AUV_NUM:  25  AVG %:  1.0  AVG Duration:  581.9
+
+TR:  1000 AUV_NUM:  25  AVG %:  1.0  AVG Duration:  587.8
+
+TR:  200 AUV_NUM:  25  AVG %:  0.9680000000000002  AVG Duration:  943.5
+
+TR:  450 AUV_NUM:  25  AVG %:  1.0  AVG Duration:  735.5
+
+TR:  650 AUV_NUM:  25  AVG %:  1.0  AVG Duration:  745.7
+
+TR:  250 AUV_NUM:  25  AVG %:  1.0  AVG Duration:  905.6
+
+TR:  950 AUV_NUM:  25  AVG %:  1.0  AVG Duration:  742.9
+
+TR:  300 AUV_NUM:  25  AVG %:  1.0  AVG Duration:  1063.7

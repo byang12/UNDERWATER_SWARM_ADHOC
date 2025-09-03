@@ -341,7 +341,7 @@ def worker_function(AUVnum=25,transmissionRange=200):
         print(AUVpercentage, sim_duration)
     avgAggregatePercentage = np.mean(AggregatePercentageList)
     avgAggregateDuration = np.mean(AggregateDurationList)
-    print('AUV_NUM: ',AUVnum, ' AVG %: ', avgAggregatePercentage, ' AVG Duration: ',avgAggregateDuration)
+    print('TR: ',transmissionRange, 'AUV_NUM: ',AUVnum, ' AVG %: ', avgAggregatePercentage, ' AVG Duration: ',avgAggregateDuration)
     return avgAggregatePercentage,avgAggregateDuration
 
 
@@ -351,11 +351,11 @@ def worker_function(AUVnum=25,transmissionRange=200):
 if __name__ == "__main__":
     processes = []
     results = []
-    transmissionRange=200
-    numProcesses = 12
+    AUVnum = 25
+    numProcesses = 20
 
     for item in range(numProcesses):
-        AUVnum = 10 + 10*item
+        transmissionRange = 50 + 50*item
         p = multiprocessing.Process(target=worker_function, args=(AUVnum,transmissionRange,))
         processes.append(p)
         p.start()
