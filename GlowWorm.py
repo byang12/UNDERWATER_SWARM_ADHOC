@@ -262,7 +262,11 @@ class Glowworm:
             yield self.env.timeout(1)
 
 
-def starting_points(num_worms):
+def starting_points_random(num_worms):
+    """Initialize the worm positions randomly."""
+    return np.random.rand(num_worms, 2) * dims
+
+def starting_points_grid(num_worms):
     """Evenly distribute particles on a grid within the search space."""
     list_glowworm = []
     start = 0.1 * dims
@@ -283,6 +287,42 @@ def starting_points(num_worms):
     
     return np.array(list_glowworm)
 
+def starting_points_spiral(num_nodes: int):
+    """
+    Calculates and plots the positions of n nodes on an Archimedean spiral.
+
+    The spiral is centered in a square area and scaled to fit within its
+    boundaries.
+
+    Args:
+        num_nodes (int): The total number of nodes (AUVs) to plot.
+    """
+    # --- 1. Define Spiral Parameters ---
+    # The spiral is centered at (0,0), so the max radius is half the side length.
+    max_radius = dims * 0.45
+    
+    # We define the spiral's "tightness" by the number of full rotations.
+    # More rotations create a denser spiral.
+    num_rotations = 10 
+    
+    # Determine the spiral constant 'a' which controls the distance between arms.
+    # The formula is R = a * theta. We want R=max_radius at theta_max.
+    theta_max = num_rotations * 2 * np.pi
+    a = max_radius / theta_max
+    
+    # --- 2. Calculate Node Positions ---
+    # Create an array of angles, one for each node, from 0 to theta_max.
+    theta = np.linspace(0, theta_max, num_nodes)
+    
+    # Calculate the radius for each node based on its angle.
+    R = a * theta
+    
+    # Convert from polar coordinates (R, theta) to Cartesian (x, y).
+    x_coords = R * np.cos(theta) + dims/2
+    y_coords = R * np.sin(theta) + dims/2
+
+    return np.stack((x_coords, y_coords), axis=1)
+
 def check_termination_condition(sim_env, particles, target_position, threshold=1.0, radius=5):
     while True:
         count_within_radius = sum(
@@ -294,7 +334,7 @@ def check_termination_condition(sim_env, particles, target_position, threshold=1
         yield sim_env.timeout(1)
 
 
-def run_gso_simpy(AUVnum=25,transmissionRange=190):
+def run_gso_simpy(AUVnum=25,transmissionRange=190,initialDeployment="grid"):
     """
     Sets up the SimPy environment, runs the glowworm process,
     and returns the recorded positions.
@@ -304,7 +344,14 @@ def run_gso_simpy(AUVnum=25,transmissionRange=190):
     # Initial population
     num_worms = AUVnum
     T_R = transmissionRange
-    pop = starting_points(num_worms)
+    if initialDeployment == "grid":
+        pop = starting_points_grid(num_worms)
+    elif initialDeployment == "random":
+        pop = starting_points_random(num_worms)
+    elif initialDeployment == "spiral":
+        starting_points_spiral(num_worms)
+    else:
+        pop = []
 
     # Create and start the GSO process
     swarm = []    
@@ -329,19 +376,20 @@ def run_gso_simpy(AUVnum=25,transmissionRange=190):
     return swarm_positions,count_within_radius/num_worms, sim_env.now
 
 
-def worker_function(AUVnum=25,transmissionRange=200):
+def worker_function(AUVnum=25,transmissionRange=300,initialDeployment="grid"):
     # Perform CPU-bound computation on 'data'
     AggregatePercentageList = []
     AggregateDurationList = []
     roundOfSimulation = 10
     for i in range(roundOfSimulation):
-        all_positions,AUVpercentage,sim_duration = run_gso_simpy(AUVnum,transmissionRange)
+        all_positions,AUVpercentage,sim_duration = run_gso_simpy(AUVnum,transmissionRange,initialDeployment)
         AggregatePercentageList.append(AUVpercentage)
         AggregateDurationList.append(sim_duration)
         print(AUVpercentage, sim_duration)
     avgAggregatePercentage = np.mean(AggregatePercentageList)
     avgAggregateDuration = np.mean(AggregateDurationList)
-    print('TR: ',transmissionRange, 'AUV_NUM: ',AUVnum, ' AVG %: ', avgAggregatePercentage, ' AVG Duration: ',avgAggregateDuration)
+    print('Initial Deployment: ', initialDeployment, ' TR: ',transmissionRange,
+          ' AUV_NUM: ',AUVnum, ' AVG %: ', avgAggregatePercentage, ' AVG Duration: ',avgAggregateDuration)
     return avgAggregatePercentage,avgAggregateDuration
 
 
@@ -352,13 +400,15 @@ if __name__ == "__main__":
     processes = []
     results = []
     AUVnum = 25
-    numProcesses = 20
-
-    for item in range(numProcesses):
-        transmissionRange = 50 + 50*item
-        p = multiprocessing.Process(target=worker_function, args=(AUVnum,transmissionRange,))
-        processes.append(p)
-        p.start()
+    #numProcesses = 20
+    transmissionRange = 300
+    initialDeploymentList = ["grid","random","spiral"]
+    
+    for initialDeployment in initialDeploymentList:
+        for AUVnum in [20, 40, 60, 80, 100]:
+            p = multiprocessing.Process(target=worker_function, args=(AUVnum,transmissionRange,initialDeployment,))
+            processes.append(p)
+            p.start()
 
     for p in processes:
         p.join() # Wait for processes to complete
