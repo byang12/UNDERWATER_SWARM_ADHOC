@@ -12,7 +12,7 @@ import multiprocessing
 dims = 1000
 nturns = 2000
 max_jitter = 0.2
-
+initialDeploymentList = ['grid','random','spiral']
 
 
 ##############################################################################
@@ -334,7 +334,7 @@ def check_termination_condition(sim_env, particles, target_position, threshold=1
         yield sim_env.timeout(1)
 
 
-def run_gso_simpy(AUVnum=25,transmissionRange=190,initialDeployment="grid"):
+def run_gso_simpy(AUVnum=25,transmissionRange=190,initialDeployment=0):
     """
     Sets up the SimPy environment, runs the glowworm process,
     and returns the recorded positions.
@@ -344,12 +344,12 @@ def run_gso_simpy(AUVnum=25,transmissionRange=190,initialDeployment="grid"):
     # Initial population
     num_worms = AUVnum
     T_R = transmissionRange
-    if initialDeployment == "grid":
+    if initialDeployment == 0:
         pop = starting_points_grid(num_worms)
-    elif initialDeployment == "random":
+    elif initialDeployment == 1:
         pop = starting_points_random(num_worms)
-    elif initialDeployment == "spiral":
-        starting_points_spiral(num_worms)
+    elif initialDeployment == 2:
+        pop = starting_points_spiral(num_worms)
     else:
         pop = []
 
@@ -376,7 +376,7 @@ def run_gso_simpy(AUVnum=25,transmissionRange=190,initialDeployment="grid"):
     return swarm_positions,count_within_radius/num_worms, sim_env.now
 
 
-def worker_function(AUVnum=25,transmissionRange=300,initialDeployment="grid"):
+def worker_function(AUVnum=25,transmissionRange=300,initialDeployment=0):
     # Perform CPU-bound computation on 'data'
     AggregatePercentageList = []
     AggregateDurationList = []
@@ -388,7 +388,7 @@ def worker_function(AUVnum=25,transmissionRange=300,initialDeployment="grid"):
         print(AUVpercentage, sim_duration)
     avgAggregatePercentage = np.mean(AggregatePercentageList)
     avgAggregateDuration = np.mean(AggregateDurationList)
-    print('Initial Deployment: ', initialDeployment, ' TR: ',transmissionRange,
+    print('Initial Deployment: ', initialDeploymentList[initialDeployment], ' TR: ',transmissionRange,
           ' AUV_NUM: ',AUVnum, ' AVG %: ', avgAggregatePercentage, ' AVG Duration: ',avgAggregateDuration)
     return avgAggregatePercentage,avgAggregateDuration
 
@@ -399,11 +399,13 @@ def worker_function(AUVnum=25,transmissionRange=300,initialDeployment="grid"):
 if __name__ == "__main__":
     processes = []
     results = []
-    AUVnum = 25
+    #AUVnum = 25
     #numProcesses = 20
     transmissionRange = 300
-    initialDeploymentList = ["grid","random","spiral"]
+    initialDeploymentList = [0,1,2]
     
+    print("Simulation Cap: ", nturns)
+
     for initialDeployment in initialDeploymentList:
         for AUVnum in [20, 40, 60, 80, 100]:
             p = multiprocessing.Process(target=worker_function, args=(AUVnum,transmissionRange,initialDeployment,))

@@ -33,3 +33,126 @@ TR:  650 AUV_NUM:  25  AVG %:  1.0  AVG Duration:  745.7
 TR:  250 AUV_NUM:  25  AVG %:  1.0  AVG Duration:  905.6
 TR:  950 AUV_NUM:  25  AVG %:  1.0  AVG Duration:  742.9
 TR:  300 AUV_NUM:  25  AVG %:  1.0  AVG Duration:  1063.7
+
+
+------------------------------------ 6000 ---------------------------------------------------------
+
+
+Initial Deployment:  spiral  TR:  300  AUV_NUM:  20  AVG %:  1.0  AVG Duration:  901.5
+Initial Deployment:  random  TR:  300  AUV_NUM:  20  AVG %:  0.675  AVG Duration:  3804.1
+Initial Deployment:  grid  TR:  300  AUV_NUM:  40  AVG %:  1.0  AVG Duration:  413.6
+Initial Deployment:  grid  TR:  300  AUV_NUM:  20  AVG %:  0.8550000000000001  AVG Duration:  3212.5
+Initial Deployment:  spiral  TR:  300  AUV_NUM:  60  AVG %:  1.0  AVG Duration:  343.0
+Initial Deployment:  grid  TR:  300  AUV_NUM:  60  AVG %:  1.0  AVG Duration:  459.6
+Initial Deployment:  random  TR:  300  AUV_NUM:  60  AVG %:  1.0  AVG Duration:  531.6
+Initial Deployment:  spiral  TR:  300  AUV_NUM:  40  AVG %:  1.0  AVG Duration:  2033.2
+Initial Deployment:  random  TR:  300  AUV_NUM:  40  AVG %:  0.9  AVG Duration:  2206.0
+Initial Deployment:  spiral  TR:  300  AUV_NUM:  80  AVG %:  1.0  AVG Duration:  345.7
+Initial Deployment:  grid  TR:  300  AUV_NUM:  80  AVG %:  1.0  AVG Duration:  429.3
+Initial Deployment:  spiral  TR:  300  AUV_NUM:  100  AVG %:  1.0  AVG Duration:  341.6
+Initial Deployment:  grid  TR:  300  AUV_NUM:  100  AVG %:  1.0  AVG Duration:  505.5
+Initial Deployment:  random  TR:  300  AUV_NUM:  80  AVG %:  1.0  AVG Duration:  1685.1
+Initial Deployment:  random  TR:  300  AUV_NUM:  100  AVG %:  1.0  AVG Duration:  1056.9
+
+
+------------------------------------------ 4000 ------------------------------------------------------
+
+
+Simulation Cap:  4000
+Initial Deployment:  spiral  TR:  300  AUV_NUM:  20  AVG %:  1.0  AVG Duration:  695.2
+Initial Deployment:  grid  TR:  300  AUV_NUM:  20  AVG %:  1.0  AVG Duration:  1497.3
+Initial Deployment:  random  TR:  300  AUV_NUM:  20  AVG %:  0.55  AVG Duration:  3298.0
+Initial Deployment:  grid  TR:  300  AUV_NUM:  40  AVG %:  1.0  AVG Duration:  422.9
+Initial Deployment:  spiral  TR:  300  AUV_NUM:  40  AVG %:  1.0  AVG Duration:  704.8
+Initial Deployment:  spiral  TR:  300  AUV_NUM:  60  AVG %:  1.0  AVG Duration:  340.0
+Initial Deployment:  random  TR:  300  AUV_NUM:  40  AVG %:  0.8  AVG Duration:  2279.4
+Initial Deployment:  spiral  TR:  300  AUV_NUM:  80  AVG %:  1.0  AVG Duration:  348.6
+Initial Deployment:  grid  TR:  300  AUV_NUM:  60  AVG %:  1.0  AVG Duration:  816.5
+Initial Deployment:  grid  TR:  300  AUV_NUM:  80  AVG %:  1.0  AVG Duration:  438.3
+Initial Deployment:  random  TR:  300  AUV_NUM:  60  AVG %:  0.9  AVG Duration:  1169.5
+Initial Deployment:  random  TR:  300  AUV_NUM:  80  AVG %:  1.0  AVG Duration:  576.1
+Initial Deployment:  spiral  TR:  300  AUV_NUM:  100  AVG %:  1.0  AVG Duration:  346.7
+Initial Deployment:  grid  TR:  300  AUV_NUM:  100  AVG %:  1.0  AVG Duration:  465.1
+Initial Deployment:  random  TR:  300  AUV_NUM:  100  AVG %:  1.0  AVG Duration:  492.3
+
+
+------------------------------------------ 2000 ------------------------------------------------------
+
+
+Simulation Cap:  2000
+Initial Deployment:  spiral  TR:  300  AUV_NUM:  20  AVG %:  1.0  AVG Duration:  659.2
+Initial Deployment:  grid  TR:  300  AUV_NUM:  20  AVG %:  1.0  AVG Duration:  898.2
+Initial Deployment:  random  TR:  300  AUV_NUM:  20  AVG %:  0.67  AVG Duration:  1440.0
+Initial Deployment:  grid  TR:  300  AUV_NUM:  40  AVG %:  0.9675  AVG Duration:  736.5
+Initial Deployment:  random  TR:  300  AUV_NUM:  40  AVG %:  0.9949999999999999  AVG Duration:  1004.9
+Initial Deployment:  spiral  TR:  300  AUV_NUM:  40  AVG %:  1.0  AVG Duration:  835.0
+Initial Deployment:  spiral  TR:  300  AUV_NUM:  60  AVG %:  1.0  AVG Duration:  342.1
+Initial Deployment:  grid  TR:  300  AUV_NUM:  60  AVG %:  1.0  AVG Duration:  458.8
+Initial Deployment:  spiral  TR:  300  AUV_NUM:  80  AVG %:  1.0  AVG Duration:  342.2
+Initial Deployment:  random  TR:  300  AUV_NUM:  60  AVG %:  0.9983333333333334  AVG Duration:  876.9
+Initial Deployment:  grid  TR:  300  AUV_NUM:  80  AVG %:  1.0  AVG Duration:  428.9
+Initial Deployment:  random  TR:  300  AUV_NUM:  80  AVG %:  1.0  AVG Duration:  501.0
+Initial Deployment:  spiral  TR:  300  AUV_NUM:  100  AVG %:  1.0  AVG Duration:  349.4
+Initial Deployment:  random  TR:  300  AUV_NUM:  100  AVG %:  1.0  AVG Duration:  496.6
+Initial Deployment:  grid  TR:  300  AUV_NUM:  100  AVG %:  1.0  AVG Duration:  485.5
+
+
+---------------------------------------- 6000 -------------------------------------------------------
+
+
+Initial Deployment:  grid  TR:  100  AUV_NUM:  25  AVG %:  0.0  AVG Duration:  6000.0
+Initial Deployment:  spiral  TR:  300  AUV_NUM:  25  AVG %:  1.0  AVG Duration:  341.2
+Initial Deployment:  random  TR:  100  AUV_NUM:  25  AVG %:  0.044  AVG Duration:  6000.0
+Initial Deployment:  grid  TR:  500  AUV_NUM:  25  AVG %:  1.0  AVG Duration:  429.3
+Initial Deployment:  spiral  TR:  100  AUV_NUM:  25  AVG %:  0.288  AVG Duration:  6000.0
+Initial Deployment:  grid  TR:  300  AUV_NUM:  25  AVG %:  1.0  AVG Duration:  984.0
+Initial Deployment:  spiral  TR:  400  AUV_NUM:  25  AVG %:  1.0  AVG Duration:  908.3
+Initial Deployment:  grid  TR:  400  AUV_NUM:  25  AVG %:  1.0  AVG Duration:  984.1
+Initial Deployment:  random  TR:  200  AUV_NUM:  25  AVG %:  0.22800000000000004  AVG Duration:  6000.0
+Initial Deployment:  spiral  TR:  500  AUV_NUM:  25  AVG %:  1.0  AVG Duration:  2041.5
+Initial Deployment:  random  TR:  400  AUV_NUM:  25  AVG %:  0.8  AVG Duration:  2715.7
+Initial Deployment:  random  TR:  300  AUV_NUM:  25  AVG %:  0.788  AVG Duration:  3291.7
+Initial Deployment:  random  TR:  500  AUV_NUM:  25  AVG %:  0.9  AVG Duration:  3279.4
+Initial Deployment:  grid  TR:  200  AUV_NUM:  25  AVG %:  0.9280000000000002  AVG Duration:  4346.2
+Initial Deployment:  spiral  TR:  200  AUV_NUM:  25  AVG %:  0.932  AVG Duration:  5432.8
+
+
+
+**************************************** 4000 ********************************************************
+
+
+Initial Deployment:  grid  TR:  100  AUV_NUM:  25  AVG %:  0.004  AVG Duration:  4000.0
+Initial Deployment:  random  TR:  100  AUV_NUM:  25  AVG %:  0.0  AVG Duration:  4000.0
+Initial Deployment:  grid  TR:  300  AUV_NUM:  25  AVG %:  1.0  AVG Duration:  425.4
+Initial Deployment:  grid  TR:  400  AUV_NUM:  25  AVG %:  1.0  AVG Duration:  429.5
+Initial Deployment:  spiral  TR:  100  AUV_NUM:  25  AVG %:  0.33599999999999997  AVG Duration:  4000.0
+Initial Deployment:  grid  TR:  500  AUV_NUM:  25  AVG %:  1.0  AVG Duration:  424.7
+Initial Deployment:  spiral  TR:  300  AUV_NUM:  25  AVG %:  1.0  AVG Duration:  715.5
+Initial Deployment:  spiral  TR:  500  AUV_NUM:  25  AVG %:  1.0  AVG Duration:  1079.5
+Initial Deployment:  random  TR:  200  AUV_NUM:  25  AVG %:  0.31199999999999994  AVG Duration:  4000.0
+Initial Deployment:  spiral  TR:  400  AUV_NUM:  25  AVG %:  0.9879999999999999  AVG Duration:  1435.7
+Initial Deployment:  random  TR:  300  AUV_NUM:  25  AVG %:  0.796  AVG Duration:  1984.6
+Initial Deployment:  random  TR:  500  AUV_NUM:  25  AVG %:  0.8  AVG Duration:  1630.1
+Initial Deployment:  grid  TR:  200  AUV_NUM:  25  AVG %:  0.8720000000000001  AVG Duration:  3311.3
+Initial Deployment:  random  TR:  400  AUV_NUM:  25  AVG %:  0.796  AVG Duration:  2312.9
+Initial Deployment:  spiral  TR:  200  AUV_NUM:  25  AVG %:  0.9359999999999999  AVG Duration:  3263.5
+
+
+**************************************** 2000 ********************************************************
+
+
+Initial Deployment:  grid  TR:  100  AUV_NUM:  25  AVG %:  0.0  AVG Duration:  2000.0
+Initial Deployment:  random  TR:  100  AUV_NUM:  25  AVG %:  0.004  AVG Duration:  2000.0
+Initial Deployment:  spiral  TR:  100  AUV_NUM:  25  AVG %:  0.356  AVG Duration:  2000.0
+Initial Deployment:  grid  TR:  300  AUV_NUM:  25  AVG %:  1.0  AVG Duration:  429.6
+Initial Deployment:  spiral  TR:  400  AUV_NUM:  25  AVG %:  1.0  AVG Duration:  349.9
+Initial Deployment:  grid  TR:  500  AUV_NUM:  25  AVG %:  1.0  AVG Duration:  433.3
+Initial Deployment:  spiral  TR:  300  AUV_NUM:  25  AVG %:  1.0  AVG Duration:  504.1
+Initial Deployment:  spiral  TR:  500  AUV_NUM:  25  AVG %:  1.0  AVG Duration:  504.8
+Initial Deployment:  random  TR:  200  AUV_NUM:  25  AVG %:  0.296  AVG Duration:  2000.0
+Initial Deployment:  grid  TR:  400  AUV_NUM:  25  AVG %:  1.0  AVG Duration:  748.1
+Initial Deployment:  grid  TR:  200  AUV_NUM:  25  AVG %:  0.9440000000000002  AVG Duration:  1272.6
+Initial Deployment:  random  TR:  500  AUV_NUM:  25  AVG %:  1.0  AVG Duration:  1038.2
+Initial Deployment:  random  TR:  300  AUV_NUM:  25  AVG %:  0.8960000000000001  AVG Duration:  1427.6
+Initial Deployment:  random  TR:  400  AUV_NUM:  25  AVG %:  0.724  AVG Duration:  1432.6
+Initial Deployment:  spiral  TR:  200  AUV_NUM:  25  AVG %:  0.952  AVG Duration:  1831.1
