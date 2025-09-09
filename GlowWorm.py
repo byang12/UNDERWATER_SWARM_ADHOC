@@ -10,7 +10,7 @@ import multiprocessing
 # GSO PARAMETERS 
 ##############################################################################
 dims = 1000
-nturns = 2000
+nturns = 6000
 max_jitter = 0.2
 initialDeploymentList = ['grid','random','spiral']
 
@@ -134,13 +134,14 @@ def weighted_random_choice(population, weights):
 ##############################################################################
 class Glowworm:
     def __init__(self, env, name, swarm, X=np.array([1, 1]), waypoint = np.array([1, 1]),  speed=1.5433, 
-                 transRange=190, score = 0.0):
+                 transRange=190, score = 0.0, errorRate = 0.0):
         self.env = env
         self.name = name
         self.swarm = swarm  # List of all particles
         self.transmission_range = transRange
         self.speed = speed # 0.015433 -> 3 knots
         self.waypoint = waypoint
+        self.errorRate = errorRate
 
         self.X = X
         self.V = np.random.randn(2) * 0.1
@@ -178,7 +179,8 @@ class Glowworm:
                 if glowworm.name != self.name:
                     polar_cor = to_relative_polar(self.X, glowworm.X)
                     msgInfluenceTable = self.prepareMsgToSend()
-                    glowworm.receive(self.name, msgInfluenceTable, polar_cor) 
+                    if np.random.rand() >= self.errorRate: # failure to recieve if not
+                        glowworm.receive(self.name, msgInfluenceTable, polar_cor) 
 
 
     def receive(self, worm_name, worm_msgInfluenceTable, polar_cor):
@@ -334,7 +336,7 @@ def check_termination_condition(sim_env, particles, target_position, threshold=1
         yield sim_env.timeout(1)
 
 
-def run_gso_simpy(AUVnum=25,transmissionRange=190,initialDeployment=0):
+def run_gso_simpy(AUVnum=25,transmissionRange=190,initialDeployment=0,LinkerrorRate = 0.0):
     """
     Sets up the SimPy environment, runs the glowworm process,
     and returns the recorded positions.
@@ -357,7 +359,7 @@ def run_gso_simpy(AUVnum=25,transmissionRange=190,initialDeployment=0):
     swarm = []    
     for i in range(num_worms):
         swarm.append(Glowworm(env = sim_env, name = i, transRange = transmissionRange, swarm = [], 
-                              X=pop[i], waypoint = pop[i]+np.random.uniform(-50, 50, size=2)))
+                              X=pop[i], waypoint = pop[i]+np.random.uniform(-50, 50, size=2),errorRate = LinkerrorRate))
 
     for glowworm in swarm:
         glowworm.swarm = swarm  # Give each glowworm the list of all glowworm
@@ -376,13 +378,13 @@ def run_gso_simpy(AUVnum=25,transmissionRange=190,initialDeployment=0):
     return swarm_positions,count_within_radius/num_worms, sim_env.now
 
 
-def worker_function(AUVnum=25,transmissionRange=300,initialDeployment=0):
+def worker_function(AUVnum=25,transmissionRange=300,initialDeployment=0,LinkerrorRate = 0.0):
     # Perform CPU-bound computation on 'data'
     AggregatePercentageList = []
     AggregateDurationList = []
     roundOfSimulation = 10
     for i in range(roundOfSimulation):
-        all_positions,AUVpercentage,sim_duration = run_gso_simpy(AUVnum,transmissionRange,initialDeployment)
+        all_positions,AUVpercentage,sim_duration = run_gso_simpy(AUVnum,transmissionRange,initialDeployment,LinkerrorRate)
         AggregatePercentageList.append(AUVpercentage)
         AggregateDurationList.append(sim_duration)
         print(AUVpercentage, sim_duration)
@@ -402,13 +404,15 @@ if __name__ == "__main__":
     #AUVnum = 25
     #numProcesses = 20
     transmissionRange = 300
-    initialDeploymentList = [0,1,2]
+    LinkerrorRateList = [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
+    #initialDeploymentList = [0,1,2]
+    initialDeployment = 0
     
     print("Simulation Cap: ", nturns)
 
-    for initialDeployment in initialDeploymentList:
-        for AUVnum in [20, 40, 60, 80, 100]:
-            p = multiprocessing.Process(target=worker_function, args=(AUVnum,transmissionRange,initialDeployment,))
+    for LinkerrorRate in LinkerrorRateList:
+        for AUVnum in [25,36,49,64,81,100]:
+            p = multiprocessing.Process(target=worker_function, args=(AUVnum,transmissionRange,initialDeployment,LinkerrorRate,))
             processes.append(p)
             p.start()
 
