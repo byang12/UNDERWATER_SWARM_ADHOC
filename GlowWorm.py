@@ -444,7 +444,7 @@ def worker_function(AUVnum=25,transmissionRange=300,initialDeployment=0,Linkerro
     print("nturns: ", nturns, ' Initial Deployment: ', initialDeploymentList[initialDeployment], ' LinkerrorRate: ', LinkerrorRate, 
           ' TR: ',transmissionRange, ' AUV_NUM: ',AUVnum, ' locatingErrorRate: ', positionER,
           ' AVG %: ', avgAggregatePercentage,' AVG Duration: ',avgAggregateDuration)
-    with open("result_linkErrorRate.txt", "a") as f:
+    with open("result_positionER.txt", "a") as f:
         f.write("\n"+str(nturns)+","+initialDeploymentList[initialDeployment]+","+str(LinkerrorRate)+","+str(transmissionRange)+","+
                 str(AUVnum)+","+str(positionER)+","+str(avgAggregatePercentage)+","+str(avgAggregateDuration))
     return avgAggregatePercentage,avgAggregateDuration
@@ -459,14 +459,16 @@ if __name__ == "__main__":
     #AUVnum = 25
     #numProcesses = 20
     transmissionRange = 300
-    LinkerrorRateList = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-    positionER = 0.0
+    #LinkerrorRateList = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    LinkerrorRate = 0.0
+    positionERList = [0.0,0.05,0.1,0.15,0.2,0.25,0.3,0.35]
+    #positionER = 0.0
     #initialDeploymentList = [0,1,2]
     initialDeployment = 0
     
     print("Simulation Cap: ", nturns)
 
-    for LinkerrorRate in LinkerrorRateList:
+    for positionER in positionERList:
         for AUVnum in [25,36,49,64,81,100]:
             p = multiprocessing.Process(target=worker_function, args=(AUVnum,transmissionRange,initialDeployment,LinkerrorRate,positionER,))
             processes.append(p)
