@@ -1,0 +1,1 @@
+nturns,InitialDeployment,LinkerrorRate,transmissionRange,AUV_NUM,locatingErrorRate,avgAggregatePercentage,avgAggregateDuration
