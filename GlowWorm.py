@@ -1,10 +1,11 @@
 ### Distributed Glowworm Optimization Scheme
 ### Wiki: https://en.wikipedia.org/wiki/Glowworm_swarm_optimization
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import simpy
 import random
 import multiprocessing
+import math
 
 ##############################################################################
 # GSO PARAMETERS 
@@ -129,12 +130,59 @@ def weighted_random_choice(population, weights):
     return random.choices(population, weights=weights)[0]
 
 
+def locating_error(point1,point2, a):
+    """
+    Generates a new random point (x2', y2') within a circle.
+
+    The circle's central point is (x2, y2).
+    The radius of the circle is a * distance((x1, y1), (x2, y2)).
+
+    Args:
+        x1 (float): The x-coordinate of the first point.
+        y1 (float): The y-coordinate of the first point.
+        x2 (float): The x-coordinate of the circle's center.
+        y2 (float): The y-coordinate of the circle's center.
+        a (float): A scaling factor for the radius.
+
+    Returns:
+        tuple[float, float]: A new point (x2', y2') randomly generated within the circle.
+    """
+
+    x1 = point1[0]
+    y1 = point1[1]
+    x2 = point2[0]
+    y2 = point2[1]
+
+    # Step 1: Calculate the distance between the two original points.
+    distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+
+    # Step 2: Calculate the radius of the circle.
+    radius = a * distance
+
+    # Step 3: Generate a random distance from the center and a random angle.
+    # To get a uniform distribution of points across the circle's area,
+    # the random distance 'r' must be proportional to the square root of a uniform random number.
+    r = radius * math.sqrt(random.uniform(0, 1))
+
+    # Generate a random angle in radians between 0 and 2*pi.
+    theta = random.uniform(0, 2 * math.pi)
+
+    # Step 4: Calculate the offset from the center (x2, y2) using polar coordinates.
+    offset_x = r * math.cos(theta)
+    offset_y = r * math.sin(theta)
+
+    # Step 5: Calculate the final coordinates of the new point.
+    x_new = x2 + offset_x
+    y_new = y2 + offset_y
+
+    return np.array([x_new, y_new])
+
 ##############################################################################
 # GSO FUNCTIONS 
 ##############################################################################
 class Glowworm:
     def __init__(self, env, name, swarm, X=np.array([1, 1]), waypoint = np.array([1, 1]),  speed=1.5433, 
-                 transRange=190, score = 0.0, errorRate = 0.0):
+                 transRange=190, score = 0.0, errorRate = 0.0,locationErrorRate=0.0):
         self.env = env
         self.name = name
         self.swarm = swarm  # List of all particles
@@ -142,6 +190,7 @@ class Glowworm:
         self.speed = speed # 0.015433 -> 3 knots
         self.waypoint = waypoint
         self.errorRate = errorRate
+        self.locationErrorRate = locationErrorRate
 
         self.X = X
         self.V = np.random.randn(2) * 0.1
@@ -177,7 +226,8 @@ class Glowworm:
             distance =  np.linalg.norm(self.X-glowworm.X)
             if distance <= self.transmission_range: # Changed from self.score
                 if glowworm.name != self.name:
-                    polar_cor = to_relative_polar(self.X, glowworm.X)
+                    errorPoint = locating_error(self.X,glowworm.X, self.locationErrorRate)
+                    polar_cor = to_relative_polar(self.X, errorPoint)
                     msgInfluenceTable = self.prepareMsgToSend()
                     if np.random.rand() >= self.errorRate: # failure to recieve if not
                         glowworm.receive(self.name, msgInfluenceTable, polar_cor) 
@@ -336,7 +386,7 @@ def check_termination_condition(sim_env, particles, target_position, threshold=1
         yield sim_env.timeout(1)
 
 
-def run_gso_simpy(AUVnum=25,transmissionRange=190,initialDeployment=0,LinkerrorRate = 0.0):
+def run_gso_simpy(AUVnum=25,transmissionRange=190,initialDeployment=0,LinkerrorRate = 0.0,positionER=0.0):
     """
     Sets up the SimPy environment, runs the glowworm process,
     and returns the recorded positions.
@@ -359,7 +409,8 @@ def run_gso_simpy(AUVnum=25,transmissionRange=190,initialDeployment=0,LinkerrorR
     swarm = []    
     for i in range(num_worms):
         swarm.append(Glowworm(env = sim_env, name = i, transRange = transmissionRange, swarm = [], 
-                              X=pop[i], waypoint = pop[i]+np.random.uniform(-50, 50, size=2),errorRate = LinkerrorRate))
+                              X=pop[i], waypoint = pop[i]+np.random.uniform(-50, 50, size=2),errorRate = LinkerrorRate,
+                              locationErrorRate=positionER))
 
     for glowworm in swarm:
         glowworm.swarm = swarm  # Give each glowworm the list of all glowworm
@@ -378,20 +429,21 @@ def run_gso_simpy(AUVnum=25,transmissionRange=190,initialDeployment=0,LinkerrorR
     return swarm_positions,count_within_radius/num_worms, sim_env.now
 
 
-def worker_function(AUVnum=25,transmissionRange=300,initialDeployment=0,LinkerrorRate = 0.0):
+def worker_function(AUVnum=25,transmissionRange=300,initialDeployment=0,LinkerrorRate = 0.0,positionER = 0.0):
     # Perform CPU-bound computation on 'data'
     AggregatePercentageList = []
     AggregateDurationList = []
     roundOfSimulation = 10
     for i in range(roundOfSimulation):
-        all_positions,AUVpercentage,sim_duration = run_gso_simpy(AUVnum,transmissionRange,initialDeployment,LinkerrorRate)
+        all_positions,AUVpercentage,sim_duration = run_gso_simpy(AUVnum,transmissionRange,initialDeployment,LinkerrorRate,positionER)
         AggregatePercentageList.append(AUVpercentage)
         AggregateDurationList.append(sim_duration)
         print(AUVpercentage, sim_duration)
     avgAggregatePercentage = np.mean(AggregatePercentageList)
     avgAggregateDuration = np.mean(AggregateDurationList)
-    print('Initial Deployment: ', initialDeploymentList[initialDeployment], ' TR: ',transmissionRange,
-          ' AUV_NUM: ',AUVnum, ' AVG %: ', avgAggregatePercentage, ' AVG Duration: ',avgAggregateDuration)
+    print('Initial Deployment: ', initialDeploymentList[initialDeployment], ' LinkerrorRate: ', LinkerrorRate, 
+          ' TR: ',transmissionRange, ' AUV_NUM: ',AUVnum, ' locatingErrorRate: ', positionER,
+          ' AVG %: ', avgAggregatePercentage,' AVG Duration: ',avgAggregateDuration)
     return avgAggregatePercentage,avgAggregateDuration
 
 
@@ -404,15 +456,16 @@ if __name__ == "__main__":
     #AUVnum = 25
     #numProcesses = 20
     transmissionRange = 300
-    LinkerrorRateList = [0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
+    locatingErrorRateList = [0.0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3]
+    LinkerrorRate = 0.0
     #initialDeploymentList = [0,1,2]
     initialDeployment = 0
     
     print("Simulation Cap: ", nturns)
 
-    for LinkerrorRate in LinkerrorRateList:
+    for positionER in locatingErrorRateList:
         for AUVnum in [25,36,49,64,81,100]:
-            p = multiprocessing.Process(target=worker_function, args=(AUVnum,transmissionRange,initialDeployment,LinkerrorRate,))
+            p = multiprocessing.Process(target=worker_function, args=(AUVnum,transmissionRange,initialDeployment,LinkerrorRate,positionER,))
             processes.append(p)
             p.start()
 
