@@ -456,23 +456,24 @@ def worker_function(AUVnum=25,transmissionRange=300,initialDeployment=0,Linkerro
 if __name__ == "__main__":
     processes = []
     results = []
-    #AUVnum = 25
+    AUVnum = 36
     #numProcesses = 20
-    transmissionRange = 200
+    #transmissionRange = 200
     #LinkerrorRateList = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
     LinkerrorRate = 0.0
     #positionERList = [0.0,0.05,0.1,0.15,0.2,0.25,0.3,0.35]
     positionER = 0.0
-    #initialDeploymentList = [0,1,2]
-    initialDeployment = 0
+    initialDeploymentList = [0,1,2]
+    #initialDeployment = 0
     
     print("Simulation Cap: ", nturns)
 
     #for positionER in positionERList:
-    for AUVnum in [10,20,30,40,50,60,70,80,90,100,110,120]:
-        p = multiprocessing.Process(target=worker_function, args=(AUVnum,transmissionRange,initialDeployment,LinkerrorRate,positionER,))
-        processes.append(p)
-        p.start()
+    for initialDeployment in initialDeploymentList:
+        for transmissionRange in [600,700]:
+            p = multiprocessing.Process(target=worker_function, args=(AUVnum,transmissionRange,initialDeployment,LinkerrorRate,positionER,))
+            processes.append(p)
+            p.start()
 
     for p in processes:
         p.join() # Wait for processes to complete
