@@ -19,12 +19,30 @@ initialDeploymentList = ['grid','random','spiral']
 ##############################################################################
 # Fitness Function 
 ##############################################################################
-def fitness_function(x, y): # Three-Hump Camel
-    x1 = x/180 - 2.9
-    x2 = y/180 - 2.9
-    # The formula for the Three-Hump Camel function
-    f_x = np.log(2 * x1**2 - 1.05 * x1**4 + (x1**6) / 6 + x1 * x2 + x2**2)
-    return (5-f_x)/10
+# def fitness_function(x, y): # Three-Hump Camel
+#     x1 = x/180 - 2.9
+#     x2 = y/180 - 2.9
+#     # The formula for the Three-Hump Camel function
+#     f_x = np.log(2 * x1**2 - 1.05 * x1**4 + (x1**6) / 6 + x1 * x2 + x2**2)
+#     return (5-f_x)/10
+
+def Easom(x,y):
+    return np.cos(x) * np.cos(y) * np.exp(-((x - np.pi)**2 + (y - np.pi)**2))
+
+def fitness_function(xx, yy): # One true, 3 false
+    x1 = xx/200 - 0.5
+    y1 = yy/200 - 0.5
+    z1 = Easom(x1,y1)
+    x2 = xx/180 + 2
+    y2 = yy/180 + 2
+    z2 = Easom(x2,y2)
+    x3 = xx/180 + 2
+    y3 = yy/180 - 1
+    z3 = Easom(x3,y3)
+    x4 = xx/180 - 1
+    y4 = yy/180 + 2
+    z4 = Easom(x4,y4)
+    return z1 + 0.7 * z2 + 0.7 * z3 + 0.7 * z4
 
 
 
@@ -470,7 +488,7 @@ if __name__ == "__main__":
 
     #for positionER in positionERList:
     for initialDeployment in initialDeploymentList:
-        for transmissionRange in [600,700]:
+        for transmissionRange in [100, 200, 300, 400, 500, 600, 700]:
             p = multiprocessing.Process(target=worker_function, args=(AUVnum,transmissionRange,initialDeployment,LinkerrorRate,positionER,))
             processes.append(p)
             p.start()
