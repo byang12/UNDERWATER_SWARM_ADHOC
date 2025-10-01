@@ -13,6 +13,7 @@ import math
 dims = 1000
 nturns = 2000
 max_jitter = 0.2
+drift = 100
 initialDeploymentList = ['grid','random','spiral']
 
 
@@ -26,23 +27,37 @@ initialDeploymentList = ['grid','random','spiral']
 #     f_x = np.log(2 * x1**2 - 1.05 * x1**4 + (x1**6) / 6 + x1 * x2 + x2**2)
 #     return (5-f_x)/10
 
-def Easom(x,y):
-    return np.cos(x) * np.cos(y) * np.exp(-((x - np.pi)**2 + (y - np.pi)**2))
+def fitness_function(x, y, drift): # Three-Hump Camel move down
+    x1 = (x)/180 - 2.777
+    x2 = (y-drift)/180 - 2.777
+    # The formula for the Three-Hump Camel function
+    f_x = np.log(2 * x1**2 - 1.05 * x1**4 + (x1**6) / 6 + x1 * x2 + x2**2)
+    return (5-f_x)/10
 
-def fitness_function(xx, yy): # One true, 3 false
-    x1 = xx/200 - 0.5
-    y1 = yy/200 - 0.5
-    z1 = Easom(x1,y1)
-    x2 = xx/180 + 2
-    y2 = yy/180 + 2
-    z2 = Easom(x2,y2)
-    x3 = xx/180 + 2
-    y3 = yy/180 - 1
-    z3 = Easom(x3,y3)
-    x4 = xx/180 - 1
-    y4 = yy/180 + 2
-    z4 = Easom(x4,y4)
-    return z1 + 0.7 * z2 + 0.7 * z3 + 0.7 * z4
+# def fitness_function(x, y): # Three-Hump Camel move up
+#     x1 = (x)/180 - 2.9
+#     x2 = (y-300)/180 - 2.9
+#     # The formula for the Three-Hump Camel function
+#     f_x = np.log(2 * x1**2 - 1.05 * x1**4 + (x1**6) / 6 + x1 * x2 + x2**2)
+#     return (5-f_x)/10
+
+# def Easom(x,y):
+#     return np.cos(x) * np.cos(y) * np.exp(-((x - np.pi)**2 + (y - np.pi)**2))
+
+# def fitness_function(xx, yy): # One true, 3 false
+#     x1 = xx/200 - 0.5
+#     y1 = yy/200 - 0.5
+#     z1 = Easom(x1,y1)
+#     x2 = xx/180 + 2
+#     y2 = yy/180 + 2
+#     z2 = Easom(x2,y2)
+#     x3 = xx/180 + 2
+#     y3 = yy/180 - 1
+#     z3 = Easom(x3,y3)
+#     x4 = xx/180 - 1
+#     y4 = yy/180 + 2
+#     z4 = Easom(x4,y4)
+#     return z1 + 0.7 * z2 + 0.7 * z3 + 0.7 * z4
 
 
 
@@ -50,11 +65,9 @@ def fitness_function(xx, yy): # One true, 3 false
 # Min Max of the fitness function
 ##############################################################################
 x, y = np.array(np.meshgrid(np.linspace(0, dims, dims), np.linspace(0, dims, dims)))
-z = fitness_function(x, y)
-x_min, y_min = x.ravel()[z.argmin()], y.ravel()[z.argmin()]
+z = fitness_function(x, y, drift)
 x_max, y_max = x.ravel()[z.argmax()], y.ravel()[z.argmax()]
-min_fitness = fitness_function(x_min, y_min)
-max_fitness = fitness_function(x_max, y_max)
+max_fitness = fitness_function(x_max, y_max, drift)
 
 
 
@@ -221,7 +234,7 @@ class Glowworm:
 
     def sensing(self): # 
         """accquire the fitness of worm's current position to calculate 'influence radius'."""
-        self.score = fitness_function(self.X[0],self.X[1])
+        self.score = fitness_function(self.X[0],self.X[1],drift)
         # if found a better score
         if self.score > self.influenceTable[self.name]['score']:
             self.influenceTable[self.name]['score'] = self.score
@@ -459,11 +472,11 @@ def worker_function(AUVnum=25,transmissionRange=300,initialDeployment=0,Linkerro
         print(AUVpercentage, sim_duration)
     avgAggregatePercentage = np.mean(AggregatePercentageList)
     avgAggregateDuration = np.mean(AggregateDurationList)
-    print("nturns: ", nturns, ' Initial Deployment: ', initialDeploymentList[initialDeployment], ' LinkerrorRate: ', LinkerrorRate, 
+    print("nturns: ", nturns, ' TestFuncDrift: ', drift,' Initial Deployment: ', initialDeploymentList[initialDeployment], ' LinkerrorRate: ', LinkerrorRate, 
           ' TR: ',transmissionRange, ' AUV_NUM: ',AUVnum, ' locatingErrorRate: ', positionER,
           ' AVG %: ', avgAggregatePercentage,' AVG Duration: ',avgAggregateDuration)
     with open("result.txt", "a") as f:
-        f.write("\n"+str(nturns)+","+initialDeploymentList[initialDeployment]+","+str(LinkerrorRate)+","+str(transmissionRange)+","+
+        f.write("\n"+str(nturns)+","+str(drift)+","+initialDeploymentList[initialDeployment]+","+str(LinkerrorRate)+","+str(transmissionRange)+","+
                 str(AUVnum)+","+str(positionER)+","+str(avgAggregatePercentage)+","+str(avgAggregateDuration))
     return avgAggregatePercentage,avgAggregateDuration
 
@@ -476,7 +489,7 @@ if __name__ == "__main__":
     results = []
     AUVnum = 36
     #numProcesses = 20
-    #transmissionRange = 200
+    transmissionRange = 300
     #LinkerrorRateList = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
     LinkerrorRate = 0.0
     #positionERList = [0.0,0.05,0.1,0.15,0.2,0.25,0.3,0.35]
@@ -488,10 +501,9 @@ if __name__ == "__main__":
 
     #for positionER in positionERList:
     for initialDeployment in initialDeploymentList:
-        for transmissionRange in [100, 200, 300, 400, 500, 600, 700]:
-            p = multiprocessing.Process(target=worker_function, args=(AUVnum,transmissionRange,initialDeployment,LinkerrorRate,positionER,))
-            processes.append(p)
-            p.start()
+        p = multiprocessing.Process(target=worker_function, args=(AUVnum,transmissionRange,initialDeployment,LinkerrorRate,positionER,))
+        processes.append(p)
+        p.start()
 
     for p in processes:
         p.join() # Wait for processes to complete
