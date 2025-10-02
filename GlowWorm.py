@@ -13,7 +13,7 @@ import math
 dims = 1000
 nturns = 2000
 max_jitter = 0.2
-drift = 100
+drift = 0
 initialDeploymentList = ['grid','random','spiral']
 
 
