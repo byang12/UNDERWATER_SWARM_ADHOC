@@ -27,12 +27,12 @@ initialDeploymentList = ['grid','random','spiral']
 #     f_x = np.log(2 * x1**2 - 1.05 * x1**4 + (x1**6) / 6 + x1 * x2 + x2**2)
 #     return (5-f_x)/10
 
-def fitness_function(x, y, drift): # Three-Hump Camel move down
-    x1 = (x)/180 - 2.777
-    x2 = (y-drift)/180 - 2.777
-    # The formula for the Three-Hump Camel function
-    f_x = np.log(2 * x1**2 - 1.05 * x1**4 + (x1**6) / 6 + x1 * x2 + x2**2)
-    return (5-f_x)/10
+# def fitness_function(x, y, drift): # Three-Hump Camel move down
+#     x1 = (x)/180 - 2.777
+#     x2 = (y-drift)/180 - 2.777
+#     # The formula for the Three-Hump Camel function
+#     f_x = np.log(2 * x1**2 - 1.05 * x1**4 + (x1**6) / 6 + x1 * x2 + x2**2)
+#     return (5-f_x)/10
 
 # def fitness_function(x, y): # Three-Hump Camel move up
 #     x1 = (x)/180 - 2.9
@@ -41,8 +41,34 @@ def fitness_function(x, y, drift): # Three-Hump Camel move down
 #     f_x = np.log(2 * x1**2 - 1.05 * x1**4 + (x1**6) / 6 + x1 * x2 + x2**2)
 #     return (5-f_x)/10
 
-# def Easom(x,y):
-#     return np.cos(x) * np.cos(y) * np.exp(-((x - np.pi)**2 + (y - np.pi)**2))
+def Easom(x,y):
+    return np.cos(x) * np.cos(y) * np.exp(-((x - np.pi)**2 + (y - np.pi)**2))
+
+# def fitness_function(xx,yy): # one target
+#     x = xx/200 - 0.5
+#     y = yy/200 - 0.5
+#     return Easom(x,y)
+
+# def fitness_function(xx,yy): # two targets
+#     x1 = xx/200 - 0.5
+#     y1 = yy/200 - 0.5
+#     z1 = Easom(x1,y1)
+#     x2 = xx/180 + 2
+#     y2 = yy/180 + 2
+#     z2 = Easom(x2,y2)
+#     return z1 + 0.7 * z2
+
+def fitness_function(xx,yy): # three targets
+    x1 = xx/200 - 0.5
+    y1 = yy/200 - 0.5
+    z1 = Easom(x1,y1)
+    x2 = xx/180 + 2
+    y2 = yy/180 + 2
+    z2 = Easom(x2,y2)
+    x3 = xx/180 + 2
+    y3 = yy/180 - 1
+    z3 = Easom(x3,y3)
+    return z1 + 0.7 * z2 + 0.7 * z3
 
 # def fitness_function(xx, yy): # One true, 3 false
 #     x1 = xx/200 - 0.5
@@ -65,9 +91,11 @@ def fitness_function(x, y, drift): # Three-Hump Camel move down
 # Min Max of the fitness function
 ##############################################################################
 x, y = np.array(np.meshgrid(np.linspace(0, dims, dims), np.linspace(0, dims, dims)))
-z = fitness_function(x, y, drift)
+#z = fitness_function(x, y, drift)
+z = fitness_function(x, y)
 x_max, y_max = x.ravel()[z.argmax()], y.ravel()[z.argmax()]
-max_fitness = fitness_function(x_max, y_max, drift)
+#max_fitness = fitness_function(x_max, y_max, drift)
+max_fitness = fitness_function(x_max, y_max)
 
 
 
@@ -234,7 +262,8 @@ class Glowworm:
 
     def sensing(self): # 
         """accquire the fitness of worm's current position to calculate 'influence radius'."""
-        self.score = fitness_function(self.X[0],self.X[1],drift)
+        #self.score = fitness_function(self.X[0],self.X[1],drift)
+        self.score = fitness_function(self.X[0],self.X[1])
         # if found a better score
         if self.score > self.influenceTable[self.name]['score']:
             self.influenceTable[self.name]['score'] = self.score
@@ -406,7 +435,7 @@ def starting_points_spiral(num_nodes: int):
 
     return np.stack((x_coords, y_coords), axis=1)
 
-def check_termination_condition(sim_env, particles, target_position, threshold=1.0, radius=5):
+def check_termination_condition(sim_env, particles, target_position, threshold=1.0, radius=10):
     while True:
         count_within_radius = sum(
             np.linalg.norm(p.X - target_position) <= radius for p in particles
@@ -487,23 +516,23 @@ def worker_function(AUVnum=25,transmissionRange=300,initialDeployment=0,Linkerro
 if __name__ == "__main__":
     processes = []
     results = []
-    AUVnum = 36
+    AUVnum = 25
     #numProcesses = 20
     transmissionRange = 300
     #LinkerrorRateList = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
     LinkerrorRate = 0.0
     #positionERList = [0.0,0.05,0.1,0.15,0.2,0.25,0.3,0.35]
     positionER = 0.0
-    initialDeploymentList = [0,1,2]
-    #initialDeployment = 0
+    #initialDeploymentList = [0,1,2]
+    initialDeployment = 0
     
     print("Simulation Cap: ", nturns)
 
     #for positionER in positionERList:
-    for initialDeployment in initialDeploymentList:
-        p = multiprocessing.Process(target=worker_function, args=(AUVnum,transmissionRange,initialDeployment,LinkerrorRate,positionER,))
-        processes.append(p)
-        p.start()
+    #for initialDeployment in initialDeploymentList:
+    p = multiprocessing.Process(target=worker_function, args=(AUVnum,transmissionRange,initialDeployment,LinkerrorRate,positionER,))
+    processes.append(p)
+    p.start()
 
     for p in processes:
         p.join() # Wait for processes to complete
