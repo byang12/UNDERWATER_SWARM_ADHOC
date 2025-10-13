@@ -12,7 +12,6 @@ import math
 ##############################################################################
 dims = 1000
 nturns = 2000
-max_jitter = 0.2
 drift = 0
 initialDeploymentList = ['grid','random','spiral']
 
@@ -20,12 +19,12 @@ initialDeploymentList = ['grid','random','spiral']
 ##############################################################################
 # Fitness Function 
 ##############################################################################
-# def fitness_function(x, y): # Three-Hump Camel
-#     x1 = x/180 - 2.9
-#     x2 = y/180 - 2.9
-#     # The formula for the Three-Hump Camel function
-#     f_x = np.log(2 * x1**2 - 1.05 * x1**4 + (x1**6) / 6 + x1 * x2 + x2**2)
-#     return (5-f_x)/10
+def fitness_function(x, y): # Three-Hump Camel
+    x1 = x/180 - 2.777
+    x2 = y/180 - 2.777
+    # The formula for the Three-Hump Camel function
+    f_x = np.log(2 * x1**2 - 1.05 * x1**4 + (x1**6) / 6 + x1 * x2 + x2**2)
+    return (5-f_x)/10
 
 # def fitness_function(x, y, drift): # Three-Hump Camel move down
 #     x1 = (x)/180 - 2.777
@@ -41,8 +40,8 @@ initialDeploymentList = ['grid','random','spiral']
 #     f_x = np.log(2 * x1**2 - 1.05 * x1**4 + (x1**6) / 6 + x1 * x2 + x2**2)
 #     return (5-f_x)/10
 
-def Easom(x,y):
-    return np.cos(x) * np.cos(y) * np.exp(-((x - np.pi)**2 + (y - np.pi)**2))
+# def Easom(x,y):
+#     return np.cos(x) * np.cos(y) * np.exp(-((x - np.pi)**2 + (y - np.pi)**2))
 
 # def fitness_function(xx,yy): # one target
 #     x = xx/200 - 0.5
@@ -58,17 +57,17 @@ def Easom(x,y):
 #     z2 = Easom(x2,y2)
 #     return z1 + 0.7 * z2
 
-def fitness_function(xx,yy): # three targets
-    x1 = xx/200 - 0.5
-    y1 = yy/200 - 0.5
-    z1 = Easom(x1,y1)
-    x2 = xx/180 + 2
-    y2 = yy/180 + 2
-    z2 = Easom(x2,y2)
-    x3 = xx/180 + 2
-    y3 = yy/180 - 1
-    z3 = Easom(x3,y3)
-    return z1 + 0.7 * z2 + 0.7 * z3
+# def fitness_function(xx,yy): # three targets
+#     x1 = xx/200 - 0.5
+#     y1 = yy/200 - 0.5
+#     z1 = Easom(x1,y1)
+#     x2 = xx/180 + 2
+#     y2 = yy/180 + 2
+#     z2 = Easom(x2,y2)
+#     x3 = xx/180 + 2
+#     y3 = yy/180 - 1
+#     z3 = Easom(x3,y3)
+#     return z1 + 0.7 * z2 + 0.7 * z3
 
 # def fitness_function(xx, yy): # One true, 3 false
 #     x1 = xx/200 - 0.5
@@ -516,9 +515,9 @@ def worker_function(AUVnum=25,transmissionRange=300,initialDeployment=0,Linkerro
 if __name__ == "__main__":
     processes = []
     results = []
-    AUVnum = 25
+    #AUVnum = 25
     #numProcesses = 20
-    transmissionRange = 300
+    # transmissionRange = 300
     #LinkerrorRateList = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
     LinkerrorRate = 0.0
     #positionERList = [0.0,0.05,0.1,0.15,0.2,0.25,0.3,0.35]
@@ -528,11 +527,11 @@ if __name__ == "__main__":
     
     print("Simulation Cap: ", nturns)
 
-    #for positionER in positionERList:
-    #for initialDeployment in initialDeploymentList:
-    p = multiprocessing.Process(target=worker_function, args=(AUVnum,transmissionRange,initialDeployment,LinkerrorRate,positionER,))
-    processes.append(p)
-    p.start()
+    for AUVnum in [25,36,49,64,81,100]:
+        for transmissionRange in [100,200,300,400,500,600]:
+            p = multiprocessing.Process(target=worker_function, args=(AUVnum,transmissionRange,initialDeployment,LinkerrorRate,positionER,))
+            processes.append(p)
+            p.start()
 
     for p in processes:
         p.join() # Wait for processes to complete
